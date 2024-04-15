@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Identification</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+    .container1 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+        border: solid 10px #f0f0f0;
+    }
+    .image-container img {
+        max-width: 100%;
+        max-height: 300px;
+    }
+</style>
+</head>
+<body>
+<header class="header">
+    <h1>Plant Identification</h1>
+</header>
+<div class="container1">
+    <div class="image-container" id="imageContainer"></div>
+    <form id="uploadForm" class="upload-form">
+        <input type="file" id="imageInput" accept="image/*" required>
+        <label for="imageInput" class="upload-button">Choose Image</label>
+        <button type="submit" class="submit-button">Identify Plant</button>
+    </form>
+    <div id="output" class="output">
+        <div class="image-container" id="imageContainer"></div>
+        <div id="plantInfo" class="plant-info"></div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p class="footer-text">By Ankit Group</p>
+</footer>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var fileInput = document.getElementById('imageInput');
+        var file = fileInput.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var imageUrl = event.target.result;
+                var imageContainer = document.getElementById('imageContainer');
+                imageContainer.innerHTML = '<img src="' + imageUrl + '" alt="Uploaded Image">';
+                // Call API for plant identification
+                identifyPlant(file);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function identifyPlant(imageFile) {
+        var formData = new FormData();
+        formData.append('image', imageFile);
+
+        fetch('https://api.plant.id/v2/identify', {
+            method: 'POST',
+            headers: {
+                'Api-Key': 'BERcfIlRzteXpIEBkjNLWW0hiZ2YKD4lAc9SiUWQvv6vLsA24b'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Extract plant name from API response
+            var plantName = data.suggestions[0].plant_name;
+            // Display plant information based on plant name with typewriter animation
+            displayPlantInformationWithTypewriter(plantName);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function displayPlantInformationWithTypewriter(plantName) {
+        var plantInfo = document.getElementById('plantInfo');
+        plantInfo.innerHTML = ''; // Clear previous content
+        // Define medicinal uses based on plant names
+        var medicinalUses = {
+            "Musa": [
+                "Treats diarrhea",
+                "Aids digestion",
+                "Boosts energy",
+                "Supports heart health",
+                "Regulates blood pressure",
+                "Improves vision",
+                "Relieves menstrual cramps",
+                "Strengthens bones",
+                "Improves brain health",
+                "Enhances skin health"
+            ],
+            "Ocimum tenuiflorum": [
+                "Relieves stress and anxiety",
+                "Improves respiratory health",
+                "Boosts immunity",
+                "Promotes digestion",
+                "Manages diabetes",
+                "Supports cardiovascular health",
+                "Acts as an adaptogen",
+                "Enhances cognitive function",
+                "Alleviates headaches",
+                "Aids in skin health"
+            ]
+            // Add more plants and their medicinal uses as needed
+        };
+        
+         // Check if the plant name exists in the medicinal uses object
+         if (plantName in medicinalUses) {
+            plantInfo.innerHTML += "<strong>Plant Name:</strong> " + plantName + "<br>";
+            plantInfo.innerHTML += "<strong>Medicinal Uses:</strong><br>";
+            medicinalUses[plantName].forEach(function(use, index) {
+                plantInfo.innerHTML += (index + 1) + ". " + use + "<br>";
+            });
+        } else {
+            plantInfo.innerHTML += "No medicinal uses found for " + plantName;
+        }
+    }
+        var plantIndex = 0;
+        var plantText = plantName;
+        var plantTypingEffect = setInterval(function() {
+            if (plantIndex < plantText.length) {
+                plantInfo.innerHTML += plantText.charAt(plantIndex);
+                plantIndex++;
+            } else {
+                clearInterval(plantTypingEffect);
+                plantInfo.innerHTML += '<br>'; // Add a line break
+                
+                // Display medicinal uses
+                displayMedicinalUses();
+            }
+        }, 100); // Typing speed (milliseconds)
+        
+        
+    
+</script>
+</body>
+</html>
