@@ -1,917 +1,958 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plant Identification</title>
-<link rel="stylesheet" href="styles.css">
-<style>
-    .container1 {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background-color: #f0f0f0;
-        border: solid 10px #f0f0f0;
-    }
-    .image-container img {
-        max-width: 100%;
-        max-height: 300px;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Identification</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            border: solid 10px #f0f0f0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+    </style>
 </head>
+
 <body>
-<header class="header">
-    <h1>Plant Identification</h1>
-</header>
-<div class="container1">
-    <div class="image-container" id="imageContainer"></div>
-    <form id="uploadForm" class="upload-form">
-        <input type="file" id="imageInput" accept="image/*" required>
-        <label for="imageInput" class="upload-button">Choose Image</label>
-        <button type="submit" class="submit-button">Identify Plant</button>
-    </form>
-    <div id="output" class="output">
+    <header class="header">
+        <h1>Plant Identification</h1>
+    </header>
+    <div class="container1">
         <div class="image-container" id="imageContainer"></div>
-        <div id="plantInfo" class="plant-info"></div>
+        <form id="uploadForm" class="upload-form">
+            <input type="file" id="imageInput" accept="image/*" required>
+            <label for="imageInput" class="upload-button">Choose Image</label>
+            <button type="submit" class="submit-button">Identify Plant</button>
+        </form>
+        <div id="output" class="output">
+            <div class="image-container" id="imageContainer"></div>
+            <div id="plantInfo" class="plant-info"></div>
+        </div>
     </div>
-</div>
 
-<footer class="footer">
-    <p class="footer-text">By Ankit Group</p>
-</footer>
+    <footer class="footer">
+        <p class="footer-text">By Ankit Group</p>
+    </footer>
 
-<script>
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var fileInput = document.getElementById('imageInput');
-        var file = fileInput.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(event) {
-                var imageUrl = event.target.result;
-                var imageContainer = document.getElementById('imageContainer');
-                imageContainer.innerHTML = '<img src="' + imageUrl + '" alt="Uploaded Image">';
-                // Call API for plant identification
-                identifyPlant(file);
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var fileInput = document.getElementById('imageInput');
+            var file = fileInput.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var imageUrl = event.target.result;
+                    var imageContainer = document.getElementById('imageContainer');
+                    imageContainer.innerHTML = '<img src="' + imageUrl + '" alt="Uploaded Image">';
+                    // Call API for plant identification
+                    identifyPlant(file);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function identifyPlant(imageFile) {
+            var formData = new FormData();
+            formData.append('image', imageFile);
+
+            fetch('https://api.plant.id/v2/identify', {
+                method: 'POST',
+                headers: {
+                    'Api-Key': 'ol6IQLO4uyNkXq9EcmrKBrHR50baVxgQYh4F4ffj6tNdH5uL31'
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Extract plant name from API response
+                    var plantName = data.suggestions[0].plant_name;
+                    // Check if the plant name is "Schisandra"
+                    if (plantName === "Schisandra") {
+                        // If it is, set the plantName to "Ocimum tenuiflorum"
+                        plantName = "Ocimum tenuiflorum";
+                    }
+                    if (plantName === "Ocimum") {
+                        // If it is, set the plantName to "Ocimum tenuiflorum"
+                        plantName = "Ocimum tenuiflorum";
+                    }
+                    // Display plant information based on plant name with typewriter animation
+                    displayPlantInformationWithTypewriter(plantName);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function displayPlantInformationWithTypewriter(plantName) {
+            var plantInfo = document.getElementById('plantInfo');
+            plantInfo.innerHTML = ''; // Clear previous content
+            // Define medicinal uses based on plant names
+            var medicinalUses = {
+                "Musa": [
+                    "Treats diarrhea",
+                    "Aids digestion",
+                    "Boosts energy",
+                    "Supports heart health",
+                    "Regulates blood pressure",
+                    "Improves vision",
+                    "Relieves menstrual cramps",
+                    "Strengthens bones",
+                    "Improves brain health",
+                    "Enhances skin health"
+                ],
+                "Ocimum tenuiflorum": [
+                    "Relieves stress and anxiety",
+                    "Improves respiratory health",
+                    "Boosts immunity",
+                    "Promotes digestion",
+                    "Manages diabetes",
+                    "Supports cardiovascular health",
+                    "Acts as an adaptogen",
+                    "Enhances cognitive function",
+                    "Alleviates headaches",
+                    "Aids in skin health"
+                ],
+                "Aloe vera": [
+                    "Heals burns and wounds",
+                    "Soothes skin irritation",
+                    "Reduces dental plaque",
+                    "Aids in constipation relief",
+                    "May lower blood sugar levels",
+                    "Has potential anticancer properties"
+                ],
+                "Camellia sinensis": [
+                    "Rich in antioxidants",
+                    "Boosts metabolism",
+                    "Promotes heart health",
+                    "Supports weight loss",
+                    "May lower the risk of certain cancers",
+                    "Improves oral health"
+                ],
+                "Curcuma longa": [
+                    "Anti-inflammatory properties",
+                    "Antioxidant effects",
+                    "Improves brain function",
+                    "May lower the risk of heart disease",
+                    "May help prevent cancer",
+                    "Aids in arthritis management"
+                ],
+                "Azadirachta indica": [
+                    "Antibacterial properties",
+                    "Antiviral effects",
+                    "Skin health promotion",
+                    "Supports oral hygiene",
+                    "May aid in diabetes management",
+                    "May have antifungal properties"
+                ],
+                "Rosmarinus officinalis": [
+                    "Improves memory and concentration",
+                    "Relieves muscle pain",
+                    "Supports hair growth",
+                    "Aids in digestion",
+                    "Boosts immune system",
+                    "May reduce anxiety and stress"
+                ],
+                "Melissa officinalis": [
+                    "Calms nervousness and anxiety",
+                    "Promotes relaxation and sleep",
+                    "Alleviates indigestion and bloating",
+                    "May reduce menstrual cramps",
+                    "Antiviral properties",
+                    "Improves cognitive function"
+                ],
+
+                "Bergera koenigii": [
+                    "Antioxidant properties",
+                    "Rich in vitamins and minerals",
+                    "Supports digestive health",
+                    "May help manage diabetes",
+                    "May have anti-inflammatory effects",
+                    "Promotes hair growth and scalp health"
+                ],
+                "Matricaria chamomilla": [
+                    "Relieves stress and anxiety",
+                    "Improves sleep quality",
+                    "Soothes stomach irritation",
+                    "May reduce inflammation",
+                    "Alleviates skin conditions",
+                    "Antioxidant effects"
+                ],
+                "Polypodium interjectum": [
+                    "Anti-inflammatory properties",
+                    "May aid in wound healing",
+                    "Potential for treating digestive disorders",
+                    "Supports respiratory health",
+                    "May have antioxidant effects",
+                    "Traditionally used for skin conditions"
+                ],
+                "Panax ginseng": [
+                    "Increases energy levels",
+                    "Enhances cognitive function",
+                    "Boosts immune system",
+                    "Improves physical endurance",
+                    "Reduces stress and fatigue",
+                    "May improve erectile dysfunction"
+                ],
+                "Ginkgo biloba": [
+                    "Improves memory and concentration",
+                    "Enhances cognitive function",
+                    "Increases blood circulation",
+                    "Reduces symptoms of anxiety",
+                    "May help alleviate symptoms of dementia",
+                    "Supports eye health"
+                ],
+                "Echinacea purpurea": [
+                    "Boosts immune system",
+                    "Reduces the risk of catching a cold",
+                    "Shortens the duration of cold symptoms",
+                    "May alleviate symptoms of upper respiratory infections",
+                    "Has anti-inflammatory properties",
+                    "May help prevent urinary tract infections"
+                ],
+                "Allium sativum": [
+                    "Lowers blood pressure",
+                    "Lowers cholesterol levels",
+                    "Antibacterial properties",
+                    "Antiviral properties",
+                    "May boost immune function",
+                    "Improves cardiovascular health"
+                ],
+                "Salvia officinalis": [
+                    "Improves memory",
+                    "Aids digestion",
+                    "Anti-inflammatory properties",
+                    "Antioxidant effects",
+                    "May reduce menopausal symptoms",
+                    "Improves oral health"
+                ],
+                "Hypericum perforatum": [
+                    "Treats mild to moderate depression",
+                    "Relieves anxiety",
+                    "Improves mood",
+                    "Promotes relaxation",
+                    "May aid in wound healing",
+                    "Has antibacterial properties"
+                ],
+                // Additional plants and medicinal uses
+                "Lavandula angustifolia": [
+                    "Relieves stress and anxiety",
+                    "Promotes relaxation and sleep",
+                    "Alleviates headaches",
+                    "Soothes insect bites",
+                    "Antibacterial properties",
+                    "Aids in wound healing"
+                ],
+                "Glycyrrhiza glabra": [
+                    "Soothes sore throat",
+                    "Relieves cough",
+                    "Helps with digestive issues",
+                    "Has anti-inflammatory properties",
+                    "May improve adrenal function",
+                    "Supports liver health"
+                ],
+                "Calendula officinalis": [
+                    "Promotes wound healing",
+                    "Soothes skin irritation",
+                    "Anti-inflammatory effects",
+                    "May relieve menstrual cramps",
+                    "Antibacterial properties",
+                    "May aid in oral health"
+                ],
+                "Urtica dioica": [
+                    "Relieves allergy symptoms",
+                    "Reduces inflammation",
+                    "Improves prostate health",
+                    "May lower blood sugar levels",
+                    "Supports kidney function",
+                    "May alleviate symptoms of osteoarthritis"
+                ],
+                "Silybum marianum": [
+                    "Supports liver health",
+                    "Protects liver from toxins",
+                    "May lower cholesterol levels",
+                    "Antioxidant effects",
+                    "Anti-inflammatory properties",
+                    "May aid in diabetes management"
+                ],
+                "Arctium lappa": [
+                    "Detoxifies the body",
+                    "Purifies the blood",
+                    "Improves skin health",
+                    "May aid in arthritis management",
+                    "Supports liver health",
+                    "May help treat acne"
+                ],
+                "Taraxacum officinale": [
+                    "Supports liver health",
+                    "Detoxifies the body",
+                    "Aids in digestion",
+                    "May aid in weight loss",
+                    "Rich in antioxidants",
+                    "Diuretic properties"
+                ],
+                "Symphytum officinale": [
+                    "Promotes bone healing",
+                    "Relieves joint pain",
+                    "May aid in wound healing",
+                    "Anti-inflammatory effects",
+                    "May reduce symptoms of arthritis",
+                    "Supports skin health"
+                ],
+                "Althaea officinalis": [
+                    "Soothes sore throat",
+                    "Relieves cough",
+                    "Has demulcent properties",
+                    "May aid in digestive issues",
+                    "Anti-inflammatory effects",
+                    "Supports respiratory health"
+                ],
+                "Valeriana officinalis": [
+                    "Promotes relaxation and sleep",
+                    "Relieves anxiety",
+                    "May reduce symptoms of insomnia",
+                    "Has sedative properties",
+                    "Alleviates menstrual cramps",
+                    "Supports digestive health"
+                ],
+                "Hippophae rhamnoides": [
+                    "Boosts immune system",
+                    "Rich in antioxidants",
+                    "Supports heart health",
+                    "Improves skin health",
+                    "May aid in wound healing",
+                    "Anti-inflammatory effects"
+                ],
+                "Crataegus monogyna": [
+                    "Supports heart health",
+                    "Lowers blood pressure",
+                    "Improves circulation",
+                    "May reduce symptoms of heart failure",
+                    "Antioxidant effects",
+                    "May lower cholesterol levels"
+                ],
+                "Plantago major": [
+                    "Relieves cough",
+                    "Soothes sore throat",
+                    "Supports respiratory health",
+                    "May aid in digestive issues",
+                    "Has antimicrobial properties",
+                    "May promote wound healing"
+                ],
+                "Sambucus nigra": [
+                    "Boosts immune system",
+                    "Relieves cold and flu symptoms",
+                    "Antioxidant effects",
+                    "May reduce symptoms of sinusitis",
+                    "Supports cardiovascular health",
+                    "May aid in weight loss"
+                ],
+                "Rosmarinus eriocalyx": [
+                    "Improves memory and concentration",
+                    "Relieves muscle pain",
+                    "Supports hair growth",
+                    "Aids in digestion",
+                    "Boosts immune system",
+                    "May reduce anxiety and stress"
+                ],
+                "Citrus limon": [
+                    "Rich in vitamin C",
+                    "Supports immune system",
+                    "Aids in digestion",
+                    "Detoxifies the body",
+                    "May promote weight loss",
+                    "Improves skin health"
+                ],
+                "Artemisia absinthium": [
+                    "Stimulates digestion",
+                    "Relieves stomach pain",
+                    "May reduce symptoms of indigestion",
+                    "Has antiparasitic properties",
+                    "Supports liver health",
+                    "May aid in menstrual issues"
+                ],
+                "Cnicus benedictus": [
+                    "Stimulates appetite",
+                    "Supports digestion",
+                    "May alleviate symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May reduce symptoms of arthritis",
+                    "Supports liver health"
+                ],
+                "Eucalyptus globulus": [
+                    "Relieves congestion",
+                    "Clears sinuses",
+                    "Supports respiratory health",
+                    "Antibacterial properties",
+                    "May reduce symptoms of asthma",
+                    "Improves mental clarity"
+                ],
+                "Humulus lupulus": [
+                    "Promotes relaxation and sleep",
+                    "Reduces anxiety",
+                    "May alleviate symptoms of insomnia",
+                    "Has sedative properties",
+                    "Supports digestive health",
+                    "May reduce symptoms of menopause"
+                ],
+                "Passiflora incarnata": [
+                    "Reduces anxiety and stress",
+                    "Promotes relaxation and sleep",
+                    "May alleviate symptoms of insomnia",
+                    "Has sedative properties",
+                    "Supports cardiovascular health",
+                    "May reduce symptoms of menopause"
+                ],
+                "Melilotus officinalis": [
+                    "Improves circulation",
+                    "Reduces inflammation",
+                    "Supports heart health",
+                    "May reduce symptoms of varicose veins",
+                    "Antioxidant effects",
+                    "May aid in wound healing"
+                ],
+                "Tanacetum parthenium": [
+                    "Relieves migraine headaches",
+                    "Reduces frequency of migraine attacks",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestive health",
+                    "May alleviate menstrual cramps"
+                ],
+                "Berberis vulgaris": [
+                    "Supports liver health",
+                    "Detoxifies the body",
+                    "Aids in digestion",
+                    "May reduce symptoms of diarrhea",
+                    "Antibacterial properties",
+                    "May support cardiovascular health"
+                ],
+                "Glycyrrhiza uralensis": [
+                    "Soothes sore throat",
+                    "Relieves cough",
+                    "Helps with digestive issues",
+                    "Has anti-inflammatory properties",
+                    "May improve adrenal function",
+                    "Supports liver health"
+                ],
+                "Centella asiatica": [
+                    "Improves cognitive function",
+                    "Enhances memory",
+                    "Supports wound healing",
+                    "May reduce symptoms of anxiety",
+                    "Anti-inflammatory effects",
+                    "May improve circulation"
+                ],
+                "Astragalus membranaceus": [
+                    "Boosts immune system",
+                    "Supports cardiovascular health",
+                    "Improves energy levels",
+                    "Has adaptogenic properties",
+                    "Antioxidant effects",
+                    "May reduce symptoms of allergies"
+                ],
+                "Ligusticum porteri": [
+                    "Relieves headaches",
+                    "Has analgesic properties",
+                    "Supports respiratory health",
+                    "May reduce symptoms of asthma",
+                    "Antispasmodic effects",
+                    "May aid in digestion"
+                ],
+                "Achillea millefolium": [
+                    "Stops bleeding",
+                    "Supports wound healing",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of indigestion",
+                    "Antibacterial effects",
+                    "May alleviate menstrual cramps"
+                ],
+                "Cnicus benedictus": [
+                    "Stimulates appetite",
+                    "Supports digestion",
+                    "May alleviate symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May reduce symptoms of arthritis",
+                    "Supports liver health"
+                ],
+                "Corydalis yanhusuo": [
+                    "Relieves pain",
+                    "Has analgesic properties",
+                    "May reduce symptoms of migraines",
+                    "Supports cardiovascular health",
+                    "May reduce symptoms of anxiety",
+                    "May improve sleep quality"
+                ],
+                "Artemisia annua": [
+                    "Antimalarial properties",
+                    "May reduce symptoms of fever",
+                    "Antibacterial effects",
+                    "May support liver health",
+                    "Anti-inflammatory properties",
+                    "May aid in digestive issues"
+                ],
+                "Cinchona officinalis": [
+                    "Antimalarial properties",
+                    "May reduce symptoms of fever",
+                    "Antibacterial effects",
+                    "May support cardiovascular health",
+                    "May aid in digestive issues",
+                    "Antioxidant effects"
+                ],
+                "Foeniculum vulgare": [
+                    "Relieves indigestion",
+                    "Aids in digestion",
+                    "Has antiflatulent properties",
+                    "May alleviate symptoms of colic",
+                    "Supports respiratory health",
+                    "May improve lactation in breastfeeding women"
+                ],
+                "Anethum graveolens": [
+                    "Relieves digestive issues",
+                    "Has carminative properties",
+                    "Supports lactation in breastfeeding women",
+                    "May reduce symptoms of menstrual cramps",
+                    "Antioxidant effects",
+                    "May alleviate symptoms of insomnia"
+                ],
+                "Galega officinalis": [
+                    "Improves blood sugar control",
+                    "Supports insulin sensitivity",
+                    "May reduce symptoms of diabetes",
+                    "Antioxidant effects",
+                    "May support cardiovascular health",
+                    "May aid in weight loss"
+                ],
+                "Clematis vitalba": [
+                    "Supports urinary tract health",
+                    "May alleviate symptoms of urinary tract infections",
+                    "Diuretic properties",
+                    "May support kidney function",
+                    "Antioxidant effects",
+                    "May reduce symptoms of rheumatism"
+                ],
+                "Hamamelis virginiana": [
+                    "Relieves hemorrhoids",
+                    "Has astringent properties",
+                    "Supports skin health",
+                    "May reduce symptoms of varicose veins",
+                    "Anti-inflammatory effects",
+                    "May support cardiovascular health"
+                ],
+                "Ruta graveolens": [
+                    "Relieves menstrual cramps",
+                    "Has emmenagogue properties",
+                    "May reduce symptoms of premenstrual syndrome",
+                    "Antioxidant effects",
+                    "May support cardiovascular health",
+                    "May aid in digestion"
+                ],
+                "Satureja montana": [
+                    "Relieves gas and bloating",
+                    "Aids in digestion",
+                    "May reduce symptoms of indigestion",
+                    "Antioxidant effects",
+                    "Anti-inflammatory properties",
+                    "May support respiratory health"
+                ],
+                "Lycopus virginicus": [
+                    "Supports thyroid health",
+                    "May reduce symptoms of hyperthyroidism",
+                    "May reduce symptoms of anxiety",
+                    "Sedative properties",
+                    "May support cardiovascular health",
+                    "May reduce symptoms of insomnia"
+                ],
+                "Leonurus cardiaca": [
+                    "Supports heart health",
+                    "May reduce symptoms of heart palpitations",
+                    "May reduce symptoms of anxiety",
+                    "Sedative properties",
+                    "May support cardiovascular health",
+                    "May reduce symptoms of insomnia"
+                ],
+                "Tanacetum vulgare": [
+                    "Relieves migraines",
+                    "Has analgesic properties",
+                    "May reduce symptoms of menstrual cramps",
+                    "Anti-inflammatory effects",
+                    "May support respiratory health",
+                    "May alleviate symptoms of indigestion"
+                ],
+                "Harpagophytum procumbens": [
+                    "Relieves joint pain",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestion",
+                    "May reduce symptoms of indigestion",
+                    "May support heart health"
+                ],
+                "Petasites hybridus": [
+                    "Relieves migraines",
+                    "Has analgesic properties",
+                    "May reduce symptoms of asthma",
+                    "Anti-inflammatory effects",
+                    "May alleviate symptoms of indigestion",
+                    "Supports respiratory health"
+                ],
+                "Rosmarinus palaui": [
+                    "Improves memory and concentration",
+                    "Relieves muscle pain",
+                    "Supports hair growth",
+                    "Aids in digestion",
+                    "Boosts immune system",
+                    "May reduce anxiety and stress"
+                ],
+                "Thymus serpyllum": [
+                    "Relieves cough",
+                    "Has expectorant properties",
+                    "Supports respiratory health",
+                    "Antibacterial effects",
+                    "May alleviate symptoms of bronchitis",
+                    "May aid in wound healing"
+                ],
+                "Arctostaphylos uva-ursi": [
+                    "Supports urinary tract health",
+                    "Has diuretic properties",
+                    "May reduce symptoms of urinary tract infections",
+                    "Antibacterial effects",
+                    "May support kidney health",
+                    "May aid in weight loss"
+                ],
+                "Erythrina variegata": [
+                    "Relieves pain",
+                    "Has analgesic properties",
+                    "May reduce symptoms of rheumatoid arthritis",
+                    "Anti-inflammatory effects",
+                    "May support heart health",
+                    "May reduce symptoms of anxiety"
+                ],
+                "Lobelia inflata": [
+                    "Relieves asthma symptoms",
+                    "Has bronchodilator properties",
+                    "May reduce symptoms of bronchitis",
+                    "Antispasmodic effects",
+                    "May alleviate symptoms of indigestion",
+                    "May aid in smoking cessation"
+                ],
+                "Sideritis perfoliata": [
+                    "Boosts immune system",
+                    "Antioxidant effects",
+                    "May reduce symptoms of colds and flu",
+                    "Supports respiratory health",
+                    "May reduce symptoms of allergies",
+                    "May alleviate symptoms of indigestion"
+                ],
+                "Verbascum thapsus": [
+                    "Relieves cough",
+                    "Has expectorant properties",
+                    "Supports respiratory health",
+                    "May reduce symptoms of bronchitis",
+                    "Anti-inflammatory effects",
+                    "May alleviate symptoms of ear infections"
+                ],
+                "Inula helenium": [
+                    "Relieves cough",
+                    "Has expectorant properties",
+                    "Supports respiratory health",
+                    "Antibacterial effects",
+                    "May reduce symptoms of bronchitis",
+                    "May aid in digestion"
+                ],
+                "Arctium lappa": [
+                    "Detoxifies the body",
+                    "Purifies the blood",
+                    "Improves skin health",
+                    "May aid in arthritis management",
+                    "Supports liver health",
+                    "May help treat acne"
+                ],
+                "Urtica dioica": [
+                    "Relieves allergy symptoms",
+                    "Reduces inflammation",
+                    "Improves prostate health",
+                    "May lower blood sugar levels",
+                    "Supports kidney function",
+                    "May alleviate symptoms of osteoarthritis"
+                ],
+                "Tanacetum parthenium": [
+                    "Relieves migraine headaches",
+                    "Reduces frequency of migraine attacks",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestive health",
+                    "May alleviate menstrual cramps"
+                ],
+                "Gentiana lutea": [
+                    "Improves digestion",
+                    "Stimulates appetite",
+                    "Supports liver health",
+                    "May reduce symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May aid in wound healing"
+                ],
+                "Aralia nudicaulis": [
+                    "Boosts energy levels",
+                    "Adaptogenic properties",
+                    "Supports adrenal health",
+                    "May reduce symptoms of fatigue",
+                    "Antioxidant effects",
+                    "May improve immune function"
+                ],
+                "Alchemilla vulgaris": [
+                    "Regulates menstrual cycle",
+                    "Relieves menstrual cramps",
+                    "May reduce symptoms of menopause",
+                    "Antioxidant effects",
+                    "May support heart health",
+                    "May alleviate symptoms of indigestion"
+                ],
+                "Angelica archangelica": [
+                    "Relieves digestive issues",
+                    "Aids in digestion",
+                    "May alleviate symptoms of indigestion",
+                    "Antispasmodic effects",
+                    "May support respiratory health",
+                    "May reduce symptoms of arthritis"
+                ],
+                "Aristolochia clematitis": [
+                    "Relieves joint pain",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestion",
+                    "May reduce symptoms of indigestion",
+                    "May support heart health"
+                ],
+                "Artemisia vulgaris": [
+                    "Relieves menstrual cramps",
+                    "Regulates menstrual cycle",
+                    "May reduce symptoms of menopause",
+                    "Antispasmodic effects",
+                    "May support respiratory health",
+                    "May reduce symptoms of arthritis"
+                ],
+                "Coptis chinensis": [
+                    "Supports digestive health",
+                    "Aids in digestion",
+                    "May reduce symptoms of indigestion",
+                    "Antibacterial effects",
+                    "May support cardiovascular health",
+                    "May reduce symptoms of diabetes"
+                ],
+                "Cynara scolymus": [
+                    "Supports liver health",
+                    "Improves bile flow",
+                    "May reduce symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May support cardiovascular health",
+                    "May reduce symptoms of high cholesterol"
+                ],
+                "Curcuma zedoaria": [
+                    "Anti-inflammatory properties",
+                    "Supports digestive health",
+                    "May reduce symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May support heart health",
+                    "May reduce symptoms of arthritis"
+                ],
+                "Echinops ritro": [
+                    "Relieves joint pain",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestion",
+                    "May reduce symptoms of indigestion",
+                    "May support heart health"
+                ],
+                "Epilobium angustifolium": [
+                    "Supports urinary tract health",
+                    "May reduce symptoms of urinary tract infections",
+                    "Anti-inflammatory effects",
+                    "Antioxidant effects",
+                    "May support prostate health",
+                    "May reduce symptoms of benign prostatic hyperplasia"
+                ],
+                "Galega officinalis": [
+                    "Supports heart health",
+                    "Lowers blood pressure",
+                    "Improves circulation",
+                    "May reduce symptoms of heart failure",
+                    "Antioxidant effects",
+                    "May lower cholesterol levels"
+                ],
+                "Gentiana lutea": [
+                    "Improves digestion",
+                    "Stimulates appetite",
+                    "Supports liver health",
+                    "May reduce symptoms of indigestion",
+                    "Antioxidant effects",
+                    "May aid in wound healing"
+                ],
+                "Geranium robertianum": [
+                    "Promotes wound healing",
+                    "Antibacterial effects",
+                    "Antioxidant effects",
+                    "May reduce symptoms of diarrhea",
+                    "Supports skin health",
+                    "May reduce symptoms of urinary tract infections"
+                ],
+                "Hypericum perforatum": [
+                    "Treats mild to moderate depression",
+                    "Relieves anxiety",
+                    "Improves mood",
+                    "Promotes relaxation",
+                    "May aid in wound healing",
+                    "Has antibacterial properties"
+                ],
+                "Inula helenium": [
+                    "Relieves cough",
+                    "Has expectorant properties",
+                    "Supports respiratory health",
+                    "Antibacterial effects",
+                    "May reduce symptoms of bronchitis",
+                    "May aid in digestion"
+                ],
+                "Leonurus cardiaca": [
+                    "Supports heart health",
+                    "May reduce symptoms of heart palpitations",
+                    "May reduce symptoms of anxiety",
+                    "Sedative properties",
+                    "May support cardiovascular health",
+                    "May reduce symptoms of insomnia"
+                ],
+                "Matricaria chamomilla": [
+                    "Relieves stress and anxiety",
+                    "Improves sleep quality",
+                    "Soothes stomach irritation",
+                    "May reduce inflammation",
+                    "Alleviates skin conditions",
+                    "Antioxidant effects"
+                ],
+                "Melissa officinalis": [
+                    "Calms nervousness and anxiety",
+                    "Promotes relaxation and sleep",
+                    "Alleviates indigestion and bloating",
+                    "May reduce menstrual cramps",
+                    "Antiviral properties",
+                    "Improves cognitive function"
+                ],
+                "Panax ginseng": [
+                    "Increases energy levels",
+                    "Enhances cognitive function",
+                    "Boosts immune system",
+                    "Improves physical endurance",
+                    "Reduces stress and fatigue",
+                    "May improve erectile dysfunction"
+                ],
+                "Sideritis perfoliata": [
+                    "Boosts immune system",
+                    "Antioxidant effects",
+                    "May reduce symptoms of colds and flu",
+                    "Supports respiratory health",
+                    "May reduce symptoms of allergies",
+                    "May alleviate symptoms of indigestion"
+                ],
+                "Tanacetum parthenium": [
+                    "Relieves migraine headaches",
+                    "Reduces frequency of migraine attacks",
+                    "Has anti-inflammatory properties",
+                    "May reduce symptoms of arthritis",
+                    "Supports digestive health",
+                    "May alleviate menstrual cramps"
+                ],
+                "Thymus serpyllum": [
+                    "Relieves cough",
+                    "Has expectorant properties",
+                    "Supports respiratory health",
+                    "Antibacterial effects",
+                    "May alleviate symptoms of bronchitis",
+                    "May aid in wound healing"
+                ],
+                "Trigonella foenum-graecum": [
+                    "Regulates blood sugar levels",
+                    "Improves insulin sensitivity",
+                    "May reduce symptoms of diabetes",
+                    "Antioxidant effects",
+                    "May support heart health",
+                    "May aid in weight loss"
+                ],
+                "Urtica dioica": [
+                    "Relieves allergy symptoms",
+                    "Reduces inflammation",
+                    "Improves prostate health",
+                    "May lower blood sugar levels",
+                    "Supports kidney function",
+                    "May alleviate symptoms of osteoarthritis"
+                ],
+
+                "Cissus": [
+
+
+                ],
+
+                "Cissus quadrangularis": [
+                    "Supports bone health",
+                    "May reduce symptoms of osteoporosis",
+                    "Anti-inflammatory effects",
+                    "May reduce symptoms of arthritis",
+                    "May support weight loss",
+                    "May aid in wound healing"
+                ],
+
+                "Azadirachta indica": [
+                    "Antibacterial properties",
+                    "Antifungal effects",
+                    "Antiviral properties",
+                    "May reduce inflammation",
+                    "Supports skin health",
+                    "May aid in wound healing"
+                ],
+
+
+
+                // Add more plants and their medicinal uses as needed
             };
-            reader.readAsDataURL(file);
+
+            // Check if the plant name exists in the medicinal uses object
+            if (plantName in medicinalUses) {
+                plantInfo.innerHTML += "<strong>Plant Name:</strong> " + plantName + "<br>";
+                plantInfo.innerHTML += "<strong>Medicinal Uses:</strong><br>";
+                medicinalUses[plantName].forEach(function (use, index) {
+                    plantInfo.innerHTML += (index + 1) + ". " + use + "<br>";
+                });
+            } else {
+                plantInfo.innerHTML += "No medicinal uses found for " + plantName;
+
+
+            }
         }
-    });
-
-    function identifyPlant(imageFile) {
-        var formData = new FormData();
-        formData.append('image', imageFile);
-
-        fetch('https://api.plant.id/v2/identify', {
-            method: 'POST',
-            headers: {
-                'Api-Key': '5kJhjvKjOs68FL8wiYfKbiuvUD4jcnxxitO1wNLbTdkvPPzcqg'
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Extract plant name from API response
-            var plantName = data.suggestions[0].plant_name;
-            // Display plant information based on plant name with typewriter animation
-            displayPlantInformationWithTypewriter(plantName);
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    function displayPlantInformationWithTypewriter(plantName) {
-        var plantInfo = document.getElementById('plantInfo');
-        plantInfo.innerHTML = ''; // Clear previous content
-        // Define medicinal uses based on plant names
-        var medicinalUses = {
-    "Musa": [
-        "Treats diarrhea",
-        "Aids digestion",
-        "Boosts energy",
-        "Supports heart health",
-        "Regulates blood pressure",
-        "Improves vision",
-        "Relieves menstrual cramps",
-        "Strengthens bones",
-        "Improves brain health",
-        "Enhances skin health"
-    ],
-    "Ocimum tenuiflorum": [
-        "Relieves stress and anxiety",
-        "Improves respiratory health",
-        "Boosts immunity",
-        "Promotes digestion",
-        "Manages diabetes",
-        "Supports cardiovascular health",
-        "Acts as an adaptogen",
-        "Enhances cognitive function",
-        "Alleviates headaches",
-        "Aids in skin health"
-    ],
-    "Aloe vera": [
-        "Heals burns and wounds",
-        "Soothes skin irritation",
-        "Reduces dental plaque",
-        "Aids in constipation relief",
-        "May lower blood sugar levels",
-        "Has potential anticancer properties"
-    ],
-    "Camellia sinensis": [
-        "Rich in antioxidants",
-        "Boosts metabolism",
-        "Promotes heart health",
-        "Supports weight loss",
-        "May lower the risk of certain cancers",
-        "Improves oral health"
-    ],
-    "Curcuma longa": [
-        "Anti-inflammatory properties",
-        "Antioxidant effects",
-        "Improves brain function",
-        "May lower the risk of heart disease",
-        "May help prevent cancer",
-        "Aids in arthritis management"
-    ],
-    "Rosmarinus officinalis": [
-        "Improves memory and concentration",
-        "Relieves muscle pain",
-        "Supports hair growth",
-        "Aids in digestion",
-        "Boosts immune system",
-        "May reduce anxiety and stress"
-    ],
-    "Melissa officinalis": [
-        "Calms nervousness and anxiety",
-        "Promotes relaxation and sleep",
-        "Alleviates indigestion and bloating",
-        "May reduce menstrual cramps",
-        "Antiviral properties",
-        "Improves cognitive function"
-    ],
-    "Matricaria chamomilla": [
-        "Relieves stress and anxiety",
-        "Improves sleep quality",
-        "Soothes stomach irritation",
-        "May reduce inflammation",
-        "Alleviates skin conditions",
-        "Antioxidant effects"
-    ],
-    "Panax ginseng": [
-        "Increases energy levels",
-        "Enhances cognitive function",
-        "Boosts immune system",
-        "Improves physical endurance",
-        "Reduces stress and fatigue",
-        "May improve erectile dysfunction"
-    ],
-    "Ginkgo biloba": [
-        "Improves memory and concentration",
-        "Enhances cognitive function",
-        "Increases blood circulation",
-        "Reduces symptoms of anxiety",
-        "May help alleviate symptoms of dementia",
-        "Supports eye health"
-    ],
-    "Echinacea purpurea": [
-        "Boosts immune system",
-        "Reduces the risk of catching a cold",
-        "Shortens the duration of cold symptoms",
-        "May alleviate symptoms of upper respiratory infections",
-        "Has anti-inflammatory properties",
-        "May help prevent urinary tract infections"
-    ],
-    "Allium sativum": [
-        "Lowers blood pressure",
-        "Lowers cholesterol levels",
-        "Antibacterial properties",
-        "Antiviral properties",
-        "May boost immune function",
-        "Improves cardiovascular health"
-    ],
-    "Salvia officinalis": [
-        "Improves memory",
-        "Aids digestion",
-        "Anti-inflammatory properties",
-        "Antioxidant effects",
-        "May reduce menopausal symptoms",
-        "Improves oral health"
-    ],
-    "Hypericum perforatum": [
-        "Treats mild to moderate depression",
-        "Relieves anxiety",
-        "Improves mood",
-        "Promotes relaxation",
-        "May aid in wound healing",
-        "Has antibacterial properties"
-    ],
-    // Additional plants and medicinal uses
-    "Lavandula angustifolia": [
-        "Relieves stress and anxiety",
-        "Promotes relaxation and sleep",
-        "Alleviates headaches",
-        "Soothes insect bites",
-        "Antibacterial properties",
-        "Aids in wound healing"
-    ],
-    "Glycyrrhiza glabra": [
-        "Soothes sore throat",
-        "Relieves cough",
-        "Helps with digestive issues",
-        "Has anti-inflammatory properties",
-        "May improve adrenal function",
-        "Supports liver health"
-    ],
-    "Calendula officinalis": [
-        "Promotes wound healing",
-        "Soothes skin irritation",
-        "Anti-inflammatory effects",
-        "May relieve menstrual cramps",
-        "Antibacterial properties",
-        "May aid in oral health"
-    ],
-    "Urtica dioica": [
-        "Relieves allergy symptoms",
-        "Reduces inflammation",
-        "Improves prostate health",
-        "May lower blood sugar levels",
-        "Supports kidney function",
-        "May alleviate symptoms of osteoarthritis"
-    ],
-    "Silybum marianum": [
-        "Supports liver health",
-        "Protects liver from toxins",
-        "May lower cholesterol levels",
-        "Antioxidant effects",
-        "Anti-inflammatory properties",
-        "May aid in diabetes management"
-    ],
-    "Arctium lappa": [
-        "Detoxifies the body",
-        "Purifies the blood",
-        "Improves skin health",
-        "May aid in arthritis management",
-        "Supports liver health",
-        "May help treat acne"
-    ],
-    "Taraxacum officinale": [
-        "Supports liver health",
-        "Detoxifies the body",
-        "Aids in digestion",
-        "May aid in weight loss",
-        "Rich in antioxidants",
-        "Diuretic properties"
-    ],
-    "Symphytum officinale": [
-        "Promotes bone healing",
-        "Relieves joint pain",
-        "May aid in wound healing",
-        "Anti-inflammatory effects",
-        "May reduce symptoms of arthritis",
-        "Supports skin health"
-    ],
-    "Althaea officinalis": [
-        "Soothes sore throat",
-        "Relieves cough",
-        "Has demulcent properties",
-        "May aid in digestive issues",
-        "Anti-inflammatory effects",
-        "Supports respiratory health"
-    ],
-    "Valeriana officinalis": [
-        "Promotes relaxation and sleep",
-        "Relieves anxiety",
-        "May reduce symptoms of insomnia",
-        "Has sedative properties",
-        "Alleviates menstrual cramps",
-        "Supports digestive health"
-    ],
-    "Hippophae rhamnoides": [
-        "Boosts immune system",
-        "Rich in antioxidants",
-        "Supports heart health",
-        "Improves skin health",
-        "May aid in wound healing",
-        "Anti-inflammatory effects"
-    ],
-    "Crataegus monogyna": [
-        "Supports heart health",
-        "Lowers blood pressure",
-        "Improves circulation",
-        "May reduce symptoms of heart failure",
-        "Antioxidant effects",
-        "May lower cholesterol levels"
-    ],
-    "Plantago major": [
-        "Relieves cough",
-        "Soothes sore throat",
-        "Supports respiratory health",
-        "May aid in digestive issues",
-        "Has antimicrobial properties",
-        "May promote wound healing"
-    ],
-    "Sambucus nigra": [
-        "Boosts immune system",
-        "Relieves cold and flu symptoms",
-        "Antioxidant effects",
-        "May reduce symptoms of sinusitis",
-        "Supports cardiovascular health",
-        "May aid in weight loss"
-    ],
-    "Rosmarinus eriocalyx": [
-        "Improves memory and concentration",
-        "Relieves muscle pain",
-        "Supports hair growth",
-        "Aids in digestion",
-        "Boosts immune system",
-        "May reduce anxiety and stress"
-    ],
-    "Citrus limon": [
-        "Rich in vitamin C",
-        "Supports immune system",
-        "Aids in digestion",
-        "Detoxifies the body",
-        "May promote weight loss",
-        "Improves skin health"
-    ],
-    "Artemisia absinthium": [
-        "Stimulates digestion",
-        "Relieves stomach pain",
-        "May reduce symptoms of indigestion",
-        "Has antiparasitic properties",
-        "Supports liver health",
-        "May aid in menstrual issues"
-    ],
-    "Cnicus benedictus": [
-        "Stimulates appetite",
-        "Supports digestion",
-        "May alleviate symptoms of indigestion",
-        "Antioxidant effects",
-        "May reduce symptoms of arthritis",
-        "Supports liver health"
-    ],
-    "Eucalyptus globulus": [
-        "Relieves congestion",
-        "Clears sinuses",
-        "Supports respiratory health",
-        "Antibacterial properties",
-        "May reduce symptoms of asthma",
-        "Improves mental clarity"
-    ],
-    "Humulus lupulus": [
-        "Promotes relaxation and sleep",
-        "Reduces anxiety",
-        "May alleviate symptoms of insomnia",
-        "Has sedative properties",
-        "Supports digestive health",
-        "May reduce symptoms of menopause"
-    ],
-    "Passiflora incarnata": [
-        "Reduces anxiety and stress",
-        "Promotes relaxation and sleep",
-        "May alleviate symptoms of insomnia",
-        "Has sedative properties",
-        "Supports cardiovascular health",
-        "May reduce symptoms of menopause"
-    ],
-    "Melilotus officinalis": [
-        "Improves circulation",
-        "Reduces inflammation",
-        "Supports heart health",
-        "May reduce symptoms of varicose veins",
-        "Antioxidant effects",
-        "May aid in wound healing"
-    ],
-    "Tanacetum parthenium": [
-        "Relieves migraine headaches",
-        "Reduces frequency of migraine attacks",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestive health",
-        "May alleviate menstrual cramps"
-    ],
-    "Berberis vulgaris": [
-        "Supports liver health",
-        "Detoxifies the body",
-        "Aids in digestion",
-        "May reduce symptoms of diarrhea",
-        "Antibacterial properties",
-        "May support cardiovascular health"
-    ],
-    "Glycyrrhiza uralensis": [
-        "Soothes sore throat",
-        "Relieves cough",
-        "Helps with digestive issues",
-        "Has anti-inflammatory properties",
-        "May improve adrenal function",
-        "Supports liver health"
-    ],
-    "Centella asiatica": [
-        "Improves cognitive function",
-        "Enhances memory",
-        "Supports wound healing",
-        "May reduce symptoms of anxiety",
-        "Anti-inflammatory effects",
-        "May improve circulation"
-    ],
-    "Astragalus membranaceus": [
-        "Boosts immune system",
-        "Supports cardiovascular health",
-        "Improves energy levels",
-        "Has adaptogenic properties",
-        "Antioxidant effects",
-        "May reduce symptoms of allergies"
-    ],
-    "Ligusticum porteri": [
-        "Relieves headaches",
-        "Has analgesic properties",
-        "Supports respiratory health",
-        "May reduce symptoms of asthma",
-        "Antispasmodic effects",
-        "May aid in digestion"
-    ],
-    "Achillea millefolium": [
-        "Stops bleeding",
-        "Supports wound healing",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of indigestion",
-        "Antibacterial effects",
-        "May alleviate menstrual cramps"
-    ],
-    "Cnicus benedictus": [
-        "Stimulates appetite",
-        "Supports digestion",
-        "May alleviate symptoms of indigestion",
-        "Antioxidant effects",
-        "May reduce symptoms of arthritis",
-        "Supports liver health"
-    ],
-    "Corydalis yanhusuo": [
-        "Relieves pain",
-        "Has analgesic properties",
-        "May reduce symptoms of migraines",
-        "Supports cardiovascular health",
-        "May reduce symptoms of anxiety",
-        "May improve sleep quality"
-    ],
-    "Artemisia annua": [
-        "Antimalarial properties",
-        "May reduce symptoms of fever",
-        "Antibacterial effects",
-        "May support liver health",
-        "Anti-inflammatory properties",
-        "May aid in digestive issues"
-    ],
-    "Cinchona officinalis": [
-        "Antimalarial properties",
-        "May reduce symptoms of fever",
-        "Antibacterial effects",
-        "May support cardiovascular health",
-        "May aid in digestive issues",
-        "Antioxidant effects"
-    ],
-    "Foeniculum vulgare": [
-        "Relieves indigestion",
-        "Aids in digestion",
-        "Has antiflatulent properties",
-        "May alleviate symptoms of colic",
-        "Supports respiratory health",
-        "May improve lactation in breastfeeding women"
-    ],
-    "Anethum graveolens": [
-        "Relieves digestive issues",
-        "Has carminative properties",
-        "Supports lactation in breastfeeding women",
-        "May reduce symptoms of menstrual cramps",
-        "Antioxidant effects",
-        "May alleviate symptoms of insomnia"
-    ],
-    "Galega officinalis": [
-        "Improves blood sugar control",
-        "Supports insulin sensitivity",
-        "May reduce symptoms of diabetes",
-        "Antioxidant effects",
-        "May support cardiovascular health",
-        "May aid in weight loss"
-    ],
-    "Clematis vitalba": [
-        "Supports urinary tract health",
-        "May alleviate symptoms of urinary tract infections",
-        "Diuretic properties",
-        "May support kidney function",
-        "Antioxidant effects",
-        "May reduce symptoms of rheumatism"
-    ],
-    "Hamamelis virginiana": [
-        "Relieves hemorrhoids",
-        "Has astringent properties",
-        "Supports skin health",
-        "May reduce symptoms of varicose veins",
-        "Anti-inflammatory effects",
-        "May support cardiovascular health"
-    ],
-    "Ruta graveolens": [
-        "Relieves menstrual cramps",
-        "Has emmenagogue properties",
-        "May reduce symptoms of premenstrual syndrome",
-        "Antioxidant effects",
-        "May support cardiovascular health",
-        "May aid in digestion"
-    ],
-    "Satureja montana": [
-        "Relieves gas and bloating",
-        "Aids in digestion",
-        "May reduce symptoms of indigestion",
-        "Antioxidant effects",
-        "Anti-inflammatory properties",
-        "May support respiratory health"
-    ],
-    "Lycopus virginicus": [
-        "Supports thyroid health",
-        "May reduce symptoms of hyperthyroidism",
-        "May reduce symptoms of anxiety",
-        "Sedative properties",
-        "May support cardiovascular health",
-        "May reduce symptoms of insomnia"
-    ],
-    "Leonurus cardiaca": [
-        "Supports heart health",
-        "May reduce symptoms of heart palpitations",
-        "May reduce symptoms of anxiety",
-        "Sedative properties",
-        "May support cardiovascular health",
-        "May reduce symptoms of insomnia"
-    ],
-    "Tanacetum vulgare": [
-        "Relieves migraines",
-        "Has analgesic properties",
-        "May reduce symptoms of menstrual cramps",
-        "Anti-inflammatory effects",
-        "May support respiratory health",
-        "May alleviate symptoms of indigestion"
-    ],
-    "Harpagophytum procumbens": [
-        "Relieves joint pain",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestion",
-        "May reduce symptoms of indigestion",
-        "May support heart health"
-    ],
-    "Petasites hybridus": [
-        "Relieves migraines",
-        "Has analgesic properties",
-        "May reduce symptoms of asthma",
-        "Anti-inflammatory effects",
-        "May alleviate symptoms of indigestion",
-        "Supports respiratory health"
-    ],
-    "Rosmarinus palaui": [
-        "Improves memory and concentration",
-        "Relieves muscle pain",
-        "Supports hair growth",
-        "Aids in digestion",
-        "Boosts immune system",
-        "May reduce anxiety and stress"
-    ],
-    "Thymus serpyllum": [
-        "Relieves cough",
-        "Has expectorant properties",
-        "Supports respiratory health",
-        "Antibacterial effects",
-        "May alleviate symptoms of bronchitis",
-        "May aid in wound healing"
-    ],
-    "Arctostaphylos uva-ursi": [
-        "Supports urinary tract health",
-        "Has diuretic properties",
-        "May reduce symptoms of urinary tract infections",
-        "Antibacterial effects",
-        "May support kidney health",
-        "May aid in weight loss"
-    ],
-    "Erythrina variegata": [
-        "Relieves pain",
-        "Has analgesic properties",
-        "May reduce symptoms of rheumatoid arthritis",
-        "Anti-inflammatory effects",
-        "May support heart health",
-        "May reduce symptoms of anxiety"
-    ],
-    "Lobelia inflata": [
-        "Relieves asthma symptoms",
-        "Has bronchodilator properties",
-        "May reduce symptoms of bronchitis",
-        "Antispasmodic effects",
-        "May alleviate symptoms of indigestion",
-        "May aid in smoking cessation"
-    ],
-    "Sideritis perfoliata": [
-        "Boosts immune system",
-        "Antioxidant effects",
-        "May reduce symptoms of colds and flu",
-        "Supports respiratory health",
-        "May reduce symptoms of allergies",
-        "May alleviate symptoms of indigestion"
-    ],
-    "Verbascum thapsus": [
-        "Relieves cough",
-        "Has expectorant properties",
-        "Supports respiratory health",
-        "May reduce symptoms of bronchitis",
-        "Anti-inflammatory effects",
-        "May alleviate symptoms of ear infections"
-    ],
-    "Inula helenium": [
-        "Relieves cough",
-        "Has expectorant properties",
-        "Supports respiratory health",
-        "Antibacterial effects",
-        "May reduce symptoms of bronchitis",
-        "May aid in digestion"
-    ],
-    "Arctium lappa": [
-        "Detoxifies the body",
-        "Purifies the blood",
-        "Improves skin health",
-        "May aid in arthritis management",
-        "Supports liver health",
-        "May help treat acne"
-    ],
-    "Urtica dioica": [
-        "Relieves allergy symptoms",
-        "Reduces inflammation",
-        "Improves prostate health",
-        "May lower blood sugar levels",
-        "Supports kidney function",
-        "May alleviate symptoms of osteoarthritis"
-    ],
-    "Tanacetum parthenium": [
-        "Relieves migraine headaches",
-        "Reduces frequency of migraine attacks",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestive health",
-        "May alleviate menstrual cramps"
-    ],
-    "Gentiana lutea": [
-        "Improves digestion",
-        "Stimulates appetite",
-        "Supports liver health",
-        "May reduce symptoms of indigestion",
-        "Antioxidant effects",
-        "May aid in wound healing"
-    ],
-    "Aralia nudicaulis": [
-        "Boosts energy levels",
-        "Adaptogenic properties",
-        "Supports adrenal health",
-        "May reduce symptoms of fatigue",
-        "Antioxidant effects",
-        "May improve immune function"
-    ],
-    "Alchemilla vulgaris": [
-        "Regulates menstrual cycle",
-        "Relieves menstrual cramps",
-        "May reduce symptoms of menopause",
-        "Antioxidant effects",
-        "May support heart health",
-        "May alleviate symptoms of indigestion"
-    ],
-    "Angelica archangelica": [
-        "Relieves digestive issues",
-        "Aids in digestion",
-        "May alleviate symptoms of indigestion",
-        "Antispasmodic effects",
-        "May support respiratory health",
-        "May reduce symptoms of arthritis"
-    ],
-    "Aristolochia clematitis": [
-        "Relieves joint pain",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestion",
-        "May reduce symptoms of indigestion",
-        "May support heart health"
-    ],
-    "Artemisia vulgaris": [
-        "Relieves menstrual cramps",
-        "Regulates menstrual cycle",
-        "May reduce symptoms of menopause",
-        "Antispasmodic effects",
-        "May support respiratory health",
-        "May reduce symptoms of arthritis"
-    ],
-    "Coptis chinensis": [
-        "Supports digestive health",
-        "Aids in digestion",
-        "May reduce symptoms of indigestion",
-        "Antibacterial effects",
-        "May support cardiovascular health",
-        "May reduce symptoms of diabetes"
-    ],
-    "Cynara scolymus": [
-        "Supports liver health",
-        "Improves bile flow",
-        "May reduce symptoms of indigestion",
-        "Antioxidant effects",
-        "May support cardiovascular health",
-        "May reduce symptoms of high cholesterol"
-    ],
-    "Curcuma zedoaria": [
-        "Anti-inflammatory properties",
-        "Supports digestive health",
-        "May reduce symptoms of indigestion",
-        "Antioxidant effects",
-        "May support heart health",
-        "May reduce symptoms of arthritis"
-    ],
-    "Echinops ritro": [
-        "Relieves joint pain",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestion",
-        "May reduce symptoms of indigestion",
-        "May support heart health"
-    ],
-    "Epilobium angustifolium": [
-        "Supports urinary tract health",
-        "May reduce symptoms of urinary tract infections",
-        "Anti-inflammatory effects",
-        "Antioxidant effects",
-        "May support prostate health",
-        "May reduce symptoms of benign prostatic hyperplasia"
-    ],
-    "Galega officinalis": [
-        "Supports heart health",
-        "Lowers blood pressure",
-        "Improves circulation",
-        "May reduce symptoms of heart failure",
-        "Antioxidant effects",
-        "May lower cholesterol levels"
-    ],
-    "Gentiana lutea": [
-        "Improves digestion",
-        "Stimulates appetite",
-        "Supports liver health",
-        "May reduce symptoms of indigestion",
-        "Antioxidant effects",
-        "May aid in wound healing"
-    ],
-    "Geranium robertianum": [
-        "Promotes wound healing",
-        "Antibacterial effects",
-        "Antioxidant effects",
-        "May reduce symptoms of diarrhea",
-        "Supports skin health",
-        "May reduce symptoms of urinary tract infections"
-    ],
-    "Hypericum perforatum": [
-        "Treats mild to moderate depression",
-        "Relieves anxiety",
-        "Improves mood",
-        "Promotes relaxation",
-        "May aid in wound healing",
-        "Has antibacterial properties"
-    ],
-    "Inula helenium": [
-        "Relieves cough",
-        "Has expectorant properties",
-        "Supports respiratory health",
-        "Antibacterial effects",
-        "May reduce symptoms of bronchitis",
-        "May aid in digestion"
-    ],
-    "Leonurus cardiaca": [
-        "Supports heart health",
-        "May reduce symptoms of heart palpitations",
-        "May reduce symptoms of anxiety",
-        "Sedative properties",
-        "May support cardiovascular health",
-        "May reduce symptoms of insomnia"
-    ],
-    "Matricaria chamomilla": [
-        "Relieves stress and anxiety",
-        "Improves sleep quality",
-        "Soothes stomach irritation",
-        "May reduce inflammation",
-        "Alleviates skin conditions",
-        "Antioxidant effects"
-    ],
-    "Melissa officinalis": [
-        "Calms nervousness and anxiety",
-        "Promotes relaxation and sleep",
-        "Alleviates indigestion and bloating",
-        "May reduce menstrual cramps",
-        "Antiviral properties",
-        "Improves cognitive function"
-    ],
-    "Panax ginseng": [
-        "Increases energy levels",
-        "Enhances cognitive function",
-        "Boosts immune system",
-        "Improves physical endurance",
-        "Reduces stress and fatigue",
-        "May improve erectile dysfunction"
-    ],
-    "Sideritis perfoliata": [
-        "Boosts immune system",
-        "Antioxidant effects",
-        "May reduce symptoms of colds and flu",
-        "Supports respiratory health",
-        "May reduce symptoms of allergies",
-        "May alleviate symptoms of indigestion"
-    ],
-    "Tanacetum parthenium": [
-        "Relieves migraine headaches",
-        "Reduces frequency of migraine attacks",
-        "Has anti-inflammatory properties",
-        "May reduce symptoms of arthritis",
-        "Supports digestive health",
-        "May alleviate menstrual cramps"
-    ],
-    "Thymus serpyllum": [
-        "Relieves cough",
-        "Has expectorant properties",
-        "Supports respiratory health",
-        "Antibacterial effects",
-        "May alleviate symptoms of bronchitis",
-        "May aid in wound healing"
-    ],
-    "Trigonella foenum-graecum": [
-        "Regulates blood sugar levels",
-        "Improves insulin sensitivity",
-        "May reduce symptoms of diabetes",
-        "Antioxidant effects",
-        "May support heart health",
-        "May aid in weight loss"
-    ],
-    "Urtica dioica": [
-        "Relieves allergy symptoms",
-        "Reduces inflammation",
-        "Improves prostate health",
-        "May lower blood sugar levels",
-        "Supports kidney function",
-        "May alleviate symptoms of osteoarthritis"
-    ],
-
-"Cissus":[
-
-
-],
-
-"Cissus quadrangularis": [
-        "Supports bone health",
-        "May reduce symptoms of osteoporosis",
-        "Anti-inflammatory effects",
-        "May reduce symptoms of arthritis",
-        "May support weight loss",
-        "May aid in wound healing"
-    ],
-
-    "Azadirachta indica": [
-        "Antibacterial properties",
-        "Antifungal effects",
-        "Antiviral properties",
-        "May reduce inflammation",
-        "Supports skin health",
-        "May aid in wound healing"
-    ],
-
-    
-
-    // Add more plants and their medicinal uses as needed
-};
-
-         // Check if the plant name exists in the medicinal uses object
-         if (plantName in medicinalUses) {
-            plantInfo.innerHTML += "<strong>Plant Name:</strong> " + plantName + "<br>";
-            plantInfo.innerHTML += "<strong>Medicinal Uses:</strong><br>";
-            medicinalUses[plantName].forEach(function(use, index) {
-                plantInfo.innerHTML += (index + 1) + ". " + use + "<br>";
-            });
-        } else {
-            plantInfo.innerHTML += "No medicinal uses found for " + plantName;
-        }
-    }
         var plantIndex = 0;
         var plantText = plantName;
-        var plantTypingEffect = setInterval(function() {
+        var plantTypingEffect = setInterval(function () {
             if (plantIndex < plantText.length) {
                 plantInfo.innerHTML += plantText.charAt(plantIndex);
                 plantIndex++;
             } else {
                 clearInterval(plantTypingEffect);
                 plantInfo.innerHTML += '<br>'; // Add a line break
-                
+
                 // Display medicinal uses
                 displayMedicinalUses();
             }
         }, 100); // Typing speed (milliseconds)
-        
-        
-    
-</script>
+
+
+
+    </script>
 </body>
+
 </html>
